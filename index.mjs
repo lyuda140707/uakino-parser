@@ -27,11 +27,12 @@ async function debugFetch() {
 // 🔍 Беремо новинки
 // ======================
 async function getLatestFilms() {
-  const html = await debugFetch();   // ← замість fetch()
+  const html = await debugFetch();
   const $ = cheerio.load(html);
 
   const films = [];
-  $(".short-img a").each((i, el) => {
+
+  $("a.short-img").each((i, el) => {
     const link = $(el).attr("href");
     if (link && link.includes("/films/")) {
       films.push(BASE + link);
@@ -41,6 +42,7 @@ async function getLatestFilms() {
   console.log("Знайдено фільмів:", films.length);
   return films;
 }
+
 
 // ======================
 // 🎬 Головна функція

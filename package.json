@@ -7,6 +7,7 @@
     "node-fetch": "^3.3.2",
     "cheerio": "^1.0.0",
     "googleapis": "^131.0.0",
-    "puppeteer": "^22.6.4"
+    "puppeteer-core": "^22.6.4",
+    "@sparticuz/chromium": "^131.0.0"
   }
 }

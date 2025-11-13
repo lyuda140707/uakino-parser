@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import cheerio from "cheerio";
+import * as cheerio from "cheerio";
 import { parseFilmPage } from "./uakinoParser.mjs";
 
 const BASE = "https://uakino.best";

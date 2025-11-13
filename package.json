@@ -1,0 +1,11 @@
+{
+  "name": "uakino-parser",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.mjs",
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "cheerio": "^1.0.0",
+    "googleapis": "^131.0.0"
+  }
+}

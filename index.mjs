@@ -27,7 +27,20 @@ async function debugFetch() {
 // 🔍 Беремо новинки
 // ======================
 async function getLatestFilms() {
-  const html = await debugFetch();
+  console.log("📡 Завантажую фільми через AJAX...");
+
+  const ajaxUrl = `${BASE}/load?ajax&do=filmlist&start=0`;
+
+  const res = await fetch(ajaxUrl, {
+    headers: {
+      "User-Agent": "Mozilla/5.0",
+      "X-Requested-With": "XMLHttpRequest",
+      "Accept": "*/*",
+    }
+  });
+
+  const html = await res.text();
+
   const $ = cheerio.load(html);
 
   const films = [];

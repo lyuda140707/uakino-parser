@@ -1,46 +1,49 @@
-import fetch from "node-fetch";
+import puppeteer from "puppeteer";
 import * as cheerio from "cheerio";
 import { parseFilmPage } from "./uakinoParser.mjs";
 
 const BASE = "https://uakino.best";
 
 // ======================
-// 🔍 DEBUG: Дивимось, що відповідає сайт
+// 🔍 Завантаження сторінки як реальний браузер
 // ======================
-async function debugFetch() {
-  const res = await fetch(`${BASE}/films/`, {
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-      "Accept": "text/html",
-    }
+async function loadPage(url) {
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-gpu",
+      "--disable-software-rasterizer"
+    ]
   });
 
-  const text = await res.text();
+  const page = await browser.newPage();
 
-  console.log("HTML length:", text.length);
-  console.log("First 300 chars:", text.slice(0, 300));
+  await page.setUserAgent(
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+    "(KHTML, like Gecko) Chrome/112.0 Safari/537.36"
+  );
 
-  return text;
+  await page.goto(url, {
+    waitUntil: "networkidle2",
+    timeout: 90000
+  });
+
+  const html = await page.content();
+  await browser.close();
+
+  return html;
 }
 
 // ======================
-// 🔍 Беремо новинки
+// 🔍 Парсимо список фільмів
 // ======================
 async function getLatestFilms() {
-  console.log("📡 Завантажую фільми через AJAX...");
+  console.log("📡 Завантажую фільми через Puppeteer...");
 
-  const ajaxUrl = `${BASE}/load?ajax&do=filmlist&start=0`;
-
-  const res = await fetch(ajaxUrl, {
-    headers: {
-      "User-Agent": "Mozilla/5.0",
-      "X-Requested-With": "XMLHttpRequest",
-      "Accept": "*/*",
-    }
-  });
-
-  const html = await res.text();
-
+  const html = await loadPage(`${BASE}/films/`);
   const $ = cheerio.load(html);
 
   const films = [];
@@ -53,12 +56,12 @@ async function getLatestFilms() {
   });
 
   console.log("Знайдено фільмів:", films.length);
+
   return films;
 }
 
-
 // ======================
-// 🎬 Головна функція
+// 🎬 Головний запуск
 // ======================
 async function main() {
   const films = await getLatestFilms();
@@ -72,3 +75,4 @@ async function main() {
 }
 
 main();
+

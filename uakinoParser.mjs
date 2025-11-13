@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import cheerio from "cheerio";
+import * as cheerio from "cheerio";
 import { extractVideo } from "./videoExtractor.mjs";
 import { writeRow } from "./sheets.mjs";
 

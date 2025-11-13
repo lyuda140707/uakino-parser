@@ -1,35 +1,31 @@
-import puppeteer from "puppeteer";
+import chromium from "@sparticuz/chromium";
+import puppeteer from "puppeteer-core";
 import * as cheerio from "cheerio";
 import { parseFilmPage } from "./uakinoParser.mjs";
 
 const BASE = "https://uakino.best";
 
 // ======================
-// 🔍 Завантаження сторінки як реальний браузер
+// 🔍 Завантаження сторінки через серверну версію Chrome
 // ======================
 async function loadPage(url) {
+  const executablePath = await chromium.executablePath;
+
   const browser = await puppeteer.launch({
-    headless: true,
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-gpu",
-      "--disable-software-rasterizer"
-    ]
+    executablePath,
+    headless: chromium.headless,
+    args: chromium.args,
+    defaultViewport: chromium.defaultViewport
   });
 
   const page = await browser.newPage();
 
   await page.setUserAgent(
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
-    "(KHTML, like Gecko) Chrome/112.0 Safari/537.36"
+    "(KHTML, like Gecko) Chrome/120.0 Safari/537.36"
   );
 
-  await page.goto(url, {
-    waitUntil: "networkidle2",
-    timeout: 90000
-  });
+  await page.goto(url, { waitUntil: "networkidle2", timeout: 90000 });
 
   const html = await page.content();
   await browser.close();
@@ -38,10 +34,8 @@ async function loadPage(url) {
 }
 
 // ======================
-// 🔍 Парсимо список фільмів
-// ======================
 async function getLatestFilms() {
-  console.log("📡 Завантажую фільми через Puppeteer...");
+  console.log("📡 Завантажую фільми через Chromium (Render)...");
 
   const html = await loadPage(`${BASE}/films/`);
   const $ = cheerio.load(html);
@@ -61,8 +55,6 @@ async function getLatestFilms() {
 }
 
 // ======================
-// 🎬 Головний запуск
-// ======================
 async function main() {
   const films = await getLatestFilms();
 
@@ -75,4 +67,3 @@ async function main() {
 }
 
 main();
-
